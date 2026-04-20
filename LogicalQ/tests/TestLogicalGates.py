@@ -68,8 +68,6 @@ def TestSingleQubitRotationGate(gate_name, lqc_method, reference_gate_factory, q
     if thetas is None:
         thetas = list(np.linspace(0, 2*np.pi, 5, endpoint=False))
 
-    # Derive fidelity tolerance from the Solovay-Kitaev approximation at the same
-    # parameters and angles the logical rotation gates will be evaluated on
     if atol is None:
         atol = sk_rotation_atol(recursion_degree=recursion_degree, depth=depth, thetas=thetas)
 
@@ -119,7 +117,6 @@ def TestMultiQubitGateConstruction(gate_name, lqc_method, n_logical_qubits, qecc
 
             lqc_method(lqc)
 
-            # Strip QEC and box ops so the circuit can be transpiled to a regular backend basis
             pm_unbox = PassManager([ClearQEC(), UnBox()])
             while "box" in lqc.count_ops():
                 lqc = pm_unbox.run(lqc)
@@ -134,7 +131,7 @@ def TestMultiQubitGateConstruction(gate_name, lqc_method, n_logical_qubits, qecc
             all_successful = False
             continue
 
-        print(f"Test{gate_name} succeeded for {qecc['label']} (construction-only sanity check)")
+        print(f"Test{gate_name} succeeded for {qecc['label']}")
 
     return all_successful
 

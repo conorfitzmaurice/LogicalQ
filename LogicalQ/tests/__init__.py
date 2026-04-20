@@ -7,14 +7,6 @@ from qiskit.circuit.library import RXGate, RYGate, RZGate
 from qiskit.quantum_info import Statevector, state_fidelity
 from qiskit.transpiler.passes import SolovayKitaev
 
-# Shared test configuration
-#
-# Tolerances are derived from their underlying sources rather than hardcoded, so the suite
-# self-calibrates to the numerical/approximation regime it is actually running in.
-
-# Absolute tolerance for fidelity == 1.0 comparisons on exact (non-approximated) gates.
-# Derived from numpy's documented default `atol` for `np.isclose`, so any drift in the
-# numpy convention automatically propagates to the test suite.
 FIDELITY_ATOL: float = inspect.signature(np.isclose).parameters["atol"].default
 
 
@@ -24,16 +16,6 @@ def sk_rotation_atol(
     basis_gates=None,
     thetas=None,
 ) -> float:
-    """Empirically derive the fidelity tolerance induced by the Solovay-Kitaev approximation
-    that `LogicalCircuit.rx/ry/rz` uses to discretize rotation gates.
-
-    The bound is computed as the worst-case state infidelity between `U_theta |0>` and
-    `SK(U_theta) |0>` over a sweep of angles and rotation axes, at the same
-    `recursion_degree`, `depth`, and `basis_gates` the logical rotation gates use. This
-    ties the tolerance directly to the parameters driving the approximation error rather
-    than relying on a hardcoded constant.
-    """
-
     if basis_gates is None:
         basis_gates = ["s", "sdg", "t", "tdg", "h", "x", "y", "z", "cz"]
 
