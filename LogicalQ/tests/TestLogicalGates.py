@@ -18,7 +18,7 @@ from LogicalQ.Transpilation.UnBox import UnBox
 
 from LogicalQ.Library.QECCs import implemented_codes
 
-from LogicalQ.tests import FIDELITY_ATOL, ROTATION_FIDELITY_ATOL
+from LogicalQ.tests import FIDELITY_ATOL, sk_rotation_atol
 
 # @TODO - find expected results in the form of statevectors, density matrices, etc.
 
@@ -61,12 +61,17 @@ def TestSingleQubitGate(gate_name, lqc_method, reference_gate, qeccs=None, init_
 
     return all_successful
 
-def TestSingleQubitRotationGate(gate_name, lqc_method, reference_gate_factory, qeccs=None, thetas=None, atol=ROTATION_FIDELITY_ATOL):
+def TestSingleQubitRotationGate(gate_name, lqc_method, reference_gate_factory, qeccs=None, thetas=None, recursion_degree=1, depth=10, atol=None):
     if qeccs is None:
         qeccs = implemented_codes
 
     if thetas is None:
         thetas = list(np.linspace(0, 2*np.pi, 5, endpoint=False))
+
+    # Derive fidelity tolerance from the Solovay-Kitaev approximation at the same
+    # parameters and angles the logical rotation gates will be evaluated on
+    if atol is None:
+        atol = sk_rotation_atol(recursion_degree=recursion_degree, depth=depth, thetas=thetas)
 
     all_successful = True
     for qecc in qeccs:
